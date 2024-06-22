@@ -1,0 +1,62 @@
+--Heighest salarys--
+--2nd Heighest Salary with sub query--
+--Nth Heighest Salary with sub query--
+--Nth Heighest Salary with CTE Table--
+--Which Deartment Getting heighest salary with sub query--
+--Which Deartment Getting heighest salary using join and cow. number with sub query--
+--Each Department wise heighest salarys--
+
+--2nd Heighest Salary with sub query--
+select max(sal) from emp
+where sal<(
+select max(sal) from emp)
+
+--Nth Heighest Salary with sub query--
+
+select top 1 ename, sal from (select distinct top 3 ename, sal from emp) --it will retrive 1st four distinct salarys-- order by sal desc)--
+as result 
+order by sal
+
+--Nth Heighest Salary with CTE Table--
+
+with cte as(
+select sal, ename, dense_rank ()over(order by sal desc) as denserank from emp)
+select top 1 sal ename from cte
+order by sal desc
+
+--Which Deartment Getting heighest salary using join and row_number with sub query--
+
+with cte as(
+select dname,ename, sal, row_number() over (order by sal desc) as salary from emp e ---using join condition and dname
+join dept d
+on e.DEPTNO=d.deptno)
+select dname, ename, sal from cte
+where salary=4
+order by salary desc
+
+--Which Deartment Getting heighest salary with sub query--
+
+select top 1 [dname], [sal] from
+(select distinct top 1 [dname], [sal] from emp e
+Join dept d
+on
+e.deptno=d.deptno
+order by sal desc) as salary
+order by sal
+
+--Each Department wise heighest salarys--
+
+with cte as(
+select dname, max(sal) as highsal from emp e /*row_number() over (order by sal desc) as salary*/  ---using join condition and dname
+join dept d
+on e.DEPTNO=d.deptno
+group by dname)
+select * from cte
+
+--2nd way--
+
+select d.dname, max(sal) as highsal
+from emp e
+join dept d
+on e.deptno=d.deptno
+group by d.dname
